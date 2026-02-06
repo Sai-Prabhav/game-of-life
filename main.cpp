@@ -9,6 +9,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
@@ -112,12 +113,14 @@ private:
 };
 
 int main(int argc, char **argv) {
-  if (argc != 3) {
-    std::cout << "Unexpected Arguments use: gol width height\n";
+  if (argc != 4) {
+    std::cout
+        << "Unexpected Arguments use: gol width height time\n";
     return -1;
   }
   int width = atoi(argv[1]);
   int height = atoi(argv[2]);
+  int sleep = atoi(argv[3]);
   gol::Grid grid = gol::Grid(width, height);
   sf::RenderWindow window(sf::VideoMode({200, 200}),
                           "SFML works!");
@@ -126,7 +129,7 @@ int main(int argc, char **argv) {
 
   grid.Print();
   bool isRunning = false;
-  for (int i = 0; i < width; i++) {
+  for (int i = 10; i < width - 10; i++) {
     grid.SetCell(i, height / 2, true);
   }
   while (window.isOpen()) {
@@ -146,6 +149,19 @@ int main(int argc, char **argv) {
         sf::View view(sf::FloatRect({0, 0}, {w, h}));
         window.setView(view);
         map.setPos(window.getSize());
+      } else if (const auto *mb =
+                     event->getIf<
+                         sf::Event::MouseButtonPressed>()) {
+        if (mb->button == sf::Mouse::Button::Left) {
+          sf::Vector2i globalPos = mb->position;
+          auto size = window.getSize();
+          auto localPos = map.globalToLocal(globalPos, size);
+
+          grid.toggleCell(localPos.x, localPos.y);
+        }
+        // mb->button is sf::Mouse::Button (Left, Right, Middle,
+        // Extra1, Extra2) mb->position is sf::Vector2i relative
+        // to window top-left
       }
     }
 
@@ -153,25 +169,14 @@ int main(int argc, char **argv) {
     window.clear();
     window.draw(map);
     window.display();
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-      sf::Vector2i globalPos = sf::Mouse::getPosition(window);
-      auto size = window.getSize();
-      auto localPos = map.globalToLocal(globalPos, size);
-      //     std::cout << "cord :" << globalPos.x << " " <<
-      //     globalPos.y
-      //               << "  " << localPos.x << " " <<
-      //               localPos.y
-      //               << " size :" << size.x << " " << size.y
-      //               << "\n";
-      grid.toggleCell(localPos.x, localPos.y);
-    }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
       isRunning = !isRunning;
     }
     if (!isRunning) {
 
     } else {
-      for (int i = 0; i < 100; i++) {
+      sf::sleep(sf::seconds(sleep));
+      for (int i = 0; i < 1; i++) {
         grid.Step();
       }
     }
