@@ -129,6 +129,7 @@ int main(int argc, char **argv) {
 
   grid.Print();
   bool isRunning = false;
+  bool isStep = false;
   for (int i = 10; i < width - 10; i++) {
     grid.SetCell(i, height / 2, true);
   }
@@ -139,6 +140,9 @@ int main(int argc, char **argv) {
         if (keyPressed->code == sf::Keyboard::Key::Space) {
 
           isRunning = !isRunning;
+        }
+        if (keyPressed->code == sf::Keyboard::Key::P) {
+          isStep = true;
         }
       }
 
@@ -174,7 +178,8 @@ int main(int argc, char **argv) {
     window.display();
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
     }
-    if (isRunning) {
+    if (isRunning or isStep) {
+      isStep = false;
       sf::sleep(sf::seconds(sleep));
       for (int i = 0; i < 1; i++) {
         grid.Step();
