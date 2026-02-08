@@ -134,12 +134,18 @@ int main(int argc, char **argv) {
   }
   while (window.isOpen()) {
     while (const std::optional event = window.pollEvent()) {
-      if (event->is<sf::Event::Closed>()) {
-        window.close();
-      }
-      if (const auto *resized =
-              event->getIf<sf::Event::Resized>()) {
+      if (const auto *keyPressed =
+              event->getIf<sf::Event::KeyPressed>()) {
+        if (keyPressed->code == sf::Keyboard::Key::Space) {
 
+          isRunning = !isRunning;
+        }
+      }
+
+      else if (event->is<sf::Event::Closed>()) {
+        window.close();
+      } else if (const auto *resized =
+                     event->getIf<sf::Event::Resized>()) {
         float w = static_cast<float>(resized->size.x);
         float h = static_cast<float>(resized->size.y);
         std::cout << "new width: " << resized->size.x
@@ -159,9 +165,6 @@ int main(int argc, char **argv) {
 
           grid.toggleCell(localPos.x, localPos.y);
         }
-        // mb->button is sf::Mouse::Button (Left, Right, Middle,
-        // Extra1, Extra2) mb->position is sf::Vector2i relative
-        // to window top-left
       }
     }
 
@@ -170,11 +173,8 @@ int main(int argc, char **argv) {
     window.draw(map);
     window.display();
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
-      isRunning = !isRunning;
     }
-    if (!isRunning) {
-
-    } else {
+    if (isRunning) {
       sf::sleep(sf::seconds(sleep));
       for (int i = 0; i < 1; i++) {
         grid.Step();
