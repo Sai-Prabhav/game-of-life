@@ -1,17 +1,19 @@
 #pragma once
 
+#include <array>
 #include <cstdio>
 #include <iostream>
 #include <vector>
 
 namespace gol {
 
+typedef std::array<bool, 18> Rule;
 class Grid
 
 {
 
 public:
-  Grid(int width, int height);
+  Grid(int width, int height, Rule rule);
   void Print();
   void Step();
 
@@ -24,7 +26,7 @@ public:
 private:
   int width;
   int height;
-
+  Rule rule;
   int SumNeighbour(int x, int y);
 };
 } // namespace gol

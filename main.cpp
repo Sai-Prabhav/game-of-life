@@ -16,12 +16,13 @@
 
 class TileMap : public sf::Drawable, public sf::Transformable {
 public:
+  sf::Vector2u tileSize;
   TileMap(sf::Vector2u windowSize, int screenWidth,
           int screenHeight) {
 
     width = screenWidth;
     height = screenHeight;
-    sf::Vector2u tileSize = sf::Vector2u(
+    tileSize = sf::Vector2u(
         {windowSize.x / width, windowSize.y / height});
     m_vertices.setPrimitiveType(sf::PrimitiveType::Triangles);
     m_vertices.resize(width * height * 6);
@@ -121,7 +122,10 @@ int main(int argc, char **argv) {
   int width = atoi(argv[1]);
   int height = atoi(argv[2]);
   int sleep = atoi(argv[3]);
-  gol::Grid grid = gol::Grid(width, height);
+  gol::Grid grid =
+      gol::Grid(width, height,
+                gol::Rule{0, 0, true, true, 0, 0, 0, 0, 0, 0, 0,
+                          0, true, 0, 0, 0, 0, 0});
   sf::RenderWindow window(sf::VideoMode({200, 200}),
                           "SFML works!");
 
@@ -137,12 +141,26 @@ int main(int argc, char **argv) {
     while (const std::optional event = window.pollEvent()) {
       if (const auto *keyPressed =
               event->getIf<sf::Event::KeyPressed>()) {
+        printf("hiii");
         if (keyPressed->code == sf::Keyboard::Key::Space) {
-
           isRunning = !isRunning;
         }
         if (keyPressed->code == sf::Keyboard::Key::P) {
+
           isStep = true;
+        }
+
+        if (keyPressed->code == sf::Keyboard::Key::Z) {
+
+          std::cout << "add" << std::endl;
+          map.tileSize +=
+              {map.tileSize.x / 10, map.tileSize.y / 10};
+        }
+        if (keyPressed->code == sf::Keyboard::Key::X) {
+
+          std::cout << "sub" << std::endl;
+          map.tileSize -=
+              {map.tileSize.x / 10, map.tileSize.y / 10};
         }
       }
 

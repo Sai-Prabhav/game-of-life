@@ -4,9 +4,26 @@
 
 namespace gol {
 
-Grid::Grid(int width, int height)
+/*****************************************************************
+ * Generalized Game of Life.
+ *
+ * This implementation allows to change the rules of game of
+ * life where the constraints are that the state of a cell in
+ * the next step is only determined by the number of alive
+ * neighbour and the current state of the cell.
+ *
+ * Any such rule can be represented by 18 bits where the first 9
+ * bits represent the state current cell is alive and next 9 bit
+ * represent the state current cell is dead. The i th bit in any
+ * state represent the next step when when there are exactly i
+ * neighbours alive.
+ *
+ * For example the classic game of life rule can be represented
+ * as 000001000000001100.
+ ****************************************************************/
+Grid::Grid(int width, int height, Rule rule)
     : width(width), height(height),
-      states(width * height, false) {}
+      states(width * height, false), rule(rule) {}
 void Grid::SetCell(int x, int y, bool state) {
   states[y * width + x] = state;
 }
@@ -31,6 +48,23 @@ void Grid::Print() {
   for (int j = 0; j < width; j++) {
     std::cout << "#";
   }
+
+  std::cout << std::endl;
+
+  std::cout << "Rule: ";
+  for (int a = 0; a < 18; a++) {
+    std::cout << rule.at(a) << " ";
+  }
+
+  std::cout << std::endl;
+  std::cout << "      ";
+  for (int a = 0; a < 10; a++) {
+    std::cout << a << " ";
+  }
+  for (int a = 10; a < 18; a++) {
+    std::cout << a;
+  }
+
   std::cout << std::endl;
 }
 bool Grid::getCell(int x, int y) {
@@ -52,16 +86,15 @@ void Grid::Step() {
         continue;
       }
       int sum = SumNeighbour(xi, yi);
-      if (sum < 2 && state) {
-        newStates[yi * width + xi] = false;
-      } else if ((sum == 3 || sum == 2) && state) {
-        newStates[yi * width + xi] = true;
-      } else if (sum > 3) {
-        newStates[yi * width + xi] = false;
-      } else if (sum == 3 && !state) {
+      int index = sum;
+      if (!state) {
+        index += 9;
+      }
+
+      if (rule.at(index)) {
         newStates[yi * width + xi] = true;
       } else {
-        newStates[yi * width + xi] = state;
+        newStates[yi * width + xi] = false;
       }
     }
   }
